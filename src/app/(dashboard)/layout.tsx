@@ -4,7 +4,8 @@
 // Dashboard Layout with Sidebar
 // ============================================
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { Header, Sidebar, MobileNav } from '@/components/layout';
 import { SplashScreen } from '@/components/ui';
@@ -14,8 +15,16 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { loading } = useAuth();
+  const { loading, isAuthenticated } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const router = useRouter();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [loading, isAuthenticated, router]);
 
   if (loading) {
     return (
@@ -28,6 +37,11 @@ export default function DashboardLayout({
         </div>
       </div>
     );
+  }
+
+  // Show nothing while redirecting to login
+  if (!isAuthenticated) {
+    return null;
   }
 
   return (

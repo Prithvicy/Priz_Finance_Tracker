@@ -28,12 +28,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Timeout to prevent infinite loading if Firebase hangs
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
+
     const unsubscribe = subscribeToAuthState((authUser) => {
+      clearTimeout(timeout);
       setUser(authUser);
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(timeout);
+      unsubscribe();
+    };
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {

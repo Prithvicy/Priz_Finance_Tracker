@@ -11,6 +11,7 @@ import { Card, CardHeader, CardTitle, CardContent, Button, Modal, ModalFooter, C
 import { ExpenseCategory, NewExpense } from '@/types';
 import { CATEGORIES, FIXED_CATEGORIES, VARIABLE_CATEGORIES } from '@/lib/utils/constants';
 import { cn } from '@/lib/cn';
+import { useSettings } from '@/hooks';
 
 // ============================================
 // Types
@@ -71,6 +72,7 @@ const CategoryButton = ({ category, onClick, delay }: CategoryButtonProps) => {
 // ============================================
 
 const QuickAdd = ({ onAdd, isLoading }: QuickAddProps) => {
+  const { currencySymbol } = useSettings();
   const [selectedCategory, setSelectedCategory] = useState<ExpenseCategory | null>(null);
   const [amount, setAmount] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -160,6 +162,7 @@ const QuickAdd = ({ onAdd, isLoading }: QuickAddProps) => {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
+            currency={currencySymbol}
             autoFocus
           />
         </div>

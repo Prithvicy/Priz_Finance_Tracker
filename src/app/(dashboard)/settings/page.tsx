@@ -145,6 +145,7 @@ export default function SettingsPage() {
                 label="Default Salary"
                 value={defaultSalary}
                 onChange={(e) => setDefaultSalary(e.target.value)}
+                currency={CURRENCIES[currency]?.symbol || '$'}
                 helperText="Your bi-weekly salary amount"
               />
               <Select

@@ -10,7 +10,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PageContainer } from '@/components/layout';
 import { Card, CardContent, Button, Input, CurrencyInput, Select, DatePicker } from '@/components/ui';
-import { useExpenses, useToast } from '@/hooks';
+import { useExpenses, useToast, useSettings } from '@/hooks';
 import { expenseFormSchema, ExpenseFormSchema } from '@/lib/utils/validators';
 import { CATEGORIES } from '@/lib/utils/constants';
 import { ExpenseCategory } from '@/types';
@@ -20,6 +20,7 @@ export default function AddExpensePage() {
   const router = useRouter();
   const { addExpense } = useExpenses();
   const toast = useToast();
+  const { currencySymbol } = useSettings();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -71,6 +72,7 @@ export default function AddExpensePage() {
             <CurrencyInput
               label="Amount"
               placeholder="0.00"
+              currency={currencySymbol}
               error={errors.amount?.message}
               {...register('amount')}
             />

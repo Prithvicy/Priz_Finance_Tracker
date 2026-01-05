@@ -48,22 +48,22 @@ const IncomeRow = ({ income, index, onEdit, onDelete, formatCurrency }: IncomeRo
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -100 }}
       transition={{ delay: index * 0.02, duration: 0.2 }}
-      className="group flex items-center gap-4 p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow"
+      className="group flex items-center gap-3 p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow"
     >
       {/* Type Icon */}
       <div
-        className="flex-shrink-0 h-12 w-12 rounded-xl flex items-center justify-center"
+        className="flex-shrink-0 h-10 w-10 rounded-xl flex items-center justify-center"
         style={{ backgroundColor: `${typeConfig.color}15` }}
       >
         {IconComponent && (
-          <IconComponent className="h-6 w-6" style={{ color: typeConfig.color }} />
+          <IconComponent className="h-5 w-5" style={{ color: typeConfig.color }} />
         )}
       </div>
 
       {/* Details */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <p className="text-sm font-semibold text-gray-900 dark:text-white">
+      <div className="flex-1 min-w-0 overflow-hidden">
+        <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+          <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
             {income.source}
           </p>
           <Badge variant="success" size="sm">
@@ -75,35 +75,35 @@ const IncomeRow = ({ income, index, onEdit, onDelete, formatCurrency }: IncomeRo
             </Badge>
           )}
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400">
+        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
           {formatDateSmart(income.date)}
           {income.note && ` • ${income.note}`}
         </p>
       </div>
 
-      {/* Amount & Actions */}
-      <div className="flex items-center gap-3">
-        <p className="text-lg font-bold text-green-600 dark:text-green-400">
-          +{formatCurrency(income.amount)}
-        </p>
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {onEdit && (
-            <button
-              onClick={() => onEdit(income)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-            >
-              <Edit2 className="h-4 w-4" />
-            </button>
-          )}
-          {onDelete && (
-            <button
-              onClick={() => onDelete(income.id)}
-              className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500 transition-colors"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          )}
-        </div>
+      {/* Amount */}
+      <p className="text-sm font-bold text-green-600 dark:text-green-400 whitespace-nowrap flex-shrink-0">
+        +{formatCurrency(income.amount)}
+      </p>
+
+      {/* Actions - only on hover/desktop */}
+      <div className="hidden sm:flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+        {onEdit && (
+          <button
+            onClick={() => onEdit(income)}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            <Edit2 className="h-4 w-4" />
+          </button>
+        )}
+        {onDelete && (
+          <button
+            onClick={() => onDelete(income.id)}
+            className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500 transition-colors"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        )}
       </div>
     </motion.div>
   );

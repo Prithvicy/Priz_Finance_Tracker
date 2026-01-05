@@ -58,8 +58,8 @@ export default function DashboardLayout({
             showMenuButton={true}
           />
 
-          {/* Page Content */}
-          <main className="min-h-[calc(100vh-4rem)]">{children}</main>
+          {/* Page Content - pb-32 for mobile nav space */}
+          <main className="pb-32 lg:pb-0">{children}</main>
         </div>
 
         {/* Mobile Bottom Navigation */}

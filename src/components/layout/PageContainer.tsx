@@ -51,7 +51,6 @@ const PageContainer = ({
       exit="exit"
       transition={{ duration: 0.2 }}
       className={cn(
-        'min-h-screen pb-28 lg:pb-8',
         'px-4 py-6 md:px-6 lg:px-8',
         className
       )}

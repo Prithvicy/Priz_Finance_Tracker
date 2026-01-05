@@ -27,6 +27,7 @@ interface SettingsContextType {
   isLoading: boolean;
   updateSettings: (updates: Partial<UserSettings>) => Promise<void>;
   formatCurrency: (cents: number, showCents?: boolean) => string;
+  currencySymbol: string;
 }
 
 const defaultSettings: UserSettings = {
@@ -131,11 +132,15 @@ export const SettingsProvider = ({ children }: SettingsProviderProps) => {
     }).format(dollars);
   }, [settings.currency]);
 
+  // Get the currency symbol
+  const currencySymbol = CURRENCIES[settings.currency]?.symbol || '$';
+
   const value: SettingsContextType = {
     settings,
     isLoading,
     updateSettings,
     formatCurrency,
+    currencySymbol,
   };
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;

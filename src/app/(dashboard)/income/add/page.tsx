@@ -10,9 +10,9 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PageContainer } from '@/components/layout';
 import { Card, CardContent, Button, Input, CurrencyInput, Select, DatePicker } from '@/components/ui';
-import { useIncome, useToast } from '@/hooks';
+import { useIncome, useToast, useSettings } from '@/hooks';
 import { incomeFormSchema, IncomeFormSchema } from '@/lib/utils/validators';
-import { INCOME_TYPES, DEFAULT_SALARY } from '@/lib/utils/constants';
+import { INCOME_TYPES } from '@/lib/utils/constants';
 import { IncomeType } from '@/types';
 import { formatDateForInput } from '@/lib/utils/formatters';
 
@@ -20,6 +20,7 @@ export default function AddIncomePage() {
   const router = useRouter();
   const { addIncome } = useIncome();
   const toast = useToast();
+  const { formatCurrency, currencySymbol, settings } = useSettings();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -48,9 +49,9 @@ export default function AddIncomePage() {
     label: config.name,
   }));
 
-  // Quick fill for salary
+  // Quick fill for salary - uses user's saved salary from settings
   const handleQuickFillSalary = () => {
-    setValue('amount', (DEFAULT_SALARY / 100).toFixed(2));
+    setValue('amount', (settings.defaultSalary / 100).toFixed(2));
     setValue('type', 'salary');
     setValue('source', 'Primary Job');
     setValue('isRegular', true);
@@ -91,7 +92,7 @@ export default function AddIncomePage() {
               onClick={handleQuickFillSalary}
               className="w-full"
             >
-              Add Bi-weekly Salary ($2,448.00)
+              Add {settings.payFrequency === 'monthly' ? 'Monthly' : settings.payFrequency === 'weekly' ? 'Weekly' : 'Bi-weekly'} Salary ({formatCurrency(settings.defaultSalary)})
             </Button>
           </div>
 
@@ -100,6 +101,7 @@ export default function AddIncomePage() {
             <CurrencyInput
               label="Amount"
               placeholder="0.00"
+              currency={currencySymbol}
               error={errors.amount?.message}
               {...register('amount')}
             />

@@ -37,13 +37,19 @@ let db: Firestore;
 const hasFirebaseConfig = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);
 
 if (hasFirebaseConfig) {
-  if (!getApps().length) {
-    app = initializeApp(firebaseConfig);
-  } else {
-    app = getApps()[0];
+  try {
+    if (!getApps().length) {
+      app = initializeApp(firebaseConfig);
+    } else {
+      app = getApps()[0];
+    }
+    auth = getAuth(app);
+    db = getFirestore(app);
+  } catch (error) {
+    console.error('Failed to initialize Firebase:', error);
   }
-  auth = getAuth(app);
-  db = getFirestore(app);
+} else if (typeof window !== 'undefined') {
+  console.warn('Firebase config missing. Check environment variables.');
 }
 
 // ============================================

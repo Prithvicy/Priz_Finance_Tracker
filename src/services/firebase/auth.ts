@@ -121,19 +121,32 @@ export const subscribeToAuthState = (
     return () => {};
   }
 
-  if (!isFirebaseConfigured()) {
+  if (!isFirebaseConfigured() || !auth) {
+    // Firebase not configured or failed to initialize
+    console.warn('Firebase auth not available, redirecting to login');
     callback(null);
     return () => {};
   }
 
-  return onAuthStateChanged(auth, async (firebaseUser) => {
-    if (firebaseUser) {
-      const profile = await getUserProfile(firebaseUser.uid);
-      callback(profile);
-    } else {
-      callback(null);
-    }
-  });
+  try {
+    return onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const profile = await getUserProfile(firebaseUser.uid);
+          callback(profile);
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
+          callback(null);
+        }
+      } else {
+        callback(null);
+      }
+    });
+  } catch (error) {
+    console.error('Error subscribing to auth state:', error);
+    callback(null);
+    return () => {};
+  }
 };
 
 // ============================================

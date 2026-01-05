@@ -7,6 +7,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Header, Sidebar, MobileNav } from '@/components/layout';
+import { SplashScreen } from '@/components/ui';
 
 export default function DashboardLayout({
   children,
@@ -30,24 +31,26 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      {/* Sidebar */}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <SplashScreen>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+        {/* Sidebar */}
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main Content */}
-      <div className="lg:pl-64">
-        {/* Header */}
-        <Header
-          onMenuClick={() => setSidebarOpen(true)}
-          showMenuButton={true}
-        />
+        {/* Main Content */}
+        <div className="lg:pl-64">
+          {/* Header */}
+          <Header
+            onMenuClick={() => setSidebarOpen(true)}
+            showMenuButton={true}
+          />
 
-        {/* Page Content */}
-        <main className="min-h-[calc(100vh-4rem)]">{children}</main>
+          {/* Page Content */}
+          <main className="min-h-[calc(100vh-4rem)]">{children}</main>
+        </div>
+
+        {/* Mobile Bottom Navigation */}
+        <MobileNav />
       </div>
-
-      {/* Mobile Bottom Navigation */}
-      <MobileNav />
-    </div>
+    </SplashScreen>
   );
 }

@@ -11,3 +11,4 @@ export * from './Badge';
 export * from './Skeleton';
 export * from './Toast';
 export * from './DatePicker';
+export * from './SplashScreen';

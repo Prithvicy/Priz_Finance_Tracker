@@ -86,8 +86,8 @@ const IncomeRow = ({ income, index, onEdit, onDelete, formatCurrency }: IncomeRo
         +{formatCurrency(income.amount)}
       </p>
 
-      {/* Actions - only on hover/desktop */}
-      <div className="hidden sm:flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+      {/* Actions - always visible on mobile, hover on desktop */}
+      <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
         {onEdit && (
           <button
             onClick={() => onEdit(income)}

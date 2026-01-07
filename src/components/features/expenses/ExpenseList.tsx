@@ -85,7 +85,7 @@ const ExpenseRow = ({ expense, index, onEdit, onDelete, formatCurrency }: Expens
         <p className="text-lg font-bold text-gray-900 dark:text-white">
           {formatCurrency(expense.amount)}
         </p>
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           {onEdit && (
             <button
               onClick={() => onEdit(expense)}

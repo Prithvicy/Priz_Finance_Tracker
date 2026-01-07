@@ -8,7 +8,7 @@ import { CategoryConfig, ExpenseCategory, GoalCategory, GoalAllocation } from '@
 // Default Values
 // ============================================
 
-export const DEFAULT_SALARY = 244800; // $2,448.00 in cents
+export const DEFAULT_SALARY = 0; // New users start with $0 until they set their income
 export const DEFAULT_PAY_FREQUENCY = 'biweekly' as const;
 export const DEFAULT_CURRENCY = 'USD';
 
@@ -16,7 +16,7 @@ export const DEFAULT_CURRENCY = 'USD';
 // Currency Configuration
 // ============================================
 
-export type CurrencyCode = 'USD' | 'INR';
+export type CurrencyCode = 'USD' | 'INR' | 'GBP' | 'EUR';
 
 export interface CurrencyConfig {
   code: CurrencyCode;
@@ -39,6 +39,20 @@ export const CURRENCIES: Record<CurrencyCode, CurrencyConfig> = {
     symbol: '₹',
     name: 'Indian Rupee',
     locale: 'en-IN',
+    decimals: 2,
+  },
+  GBP: {
+    code: 'GBP',
+    symbol: '£',
+    name: 'British Pound',
+    locale: 'en-GB',
+    decimals: 2,
+  },
+  EUR: {
+    code: 'EUR',
+    symbol: '€',
+    name: 'Euro',
+    locale: 'de-DE',
     decimals: 2,
   },
 };
@@ -104,18 +118,42 @@ export const CATEGORIES: Record<ExpenseCategory, CategoryConfig> = {
     type: 'variable',
     order: 7,
   },
+  fuel: {
+    id: 'fuel',
+    name: 'Fuel',
+    icon: 'Fuel',
+    color: '#0EA5E9',
+    type: 'variable',
+    order: 8,
+  },
+  subscriptions: {
+    id: 'subscriptions',
+    name: 'Subscriptions',
+    icon: 'RefreshCw',
+    color: '#A855F7',
+    type: 'fixed',
+    order: 9,
+  },
+  travel: {
+    id: 'travel',
+    name: 'Travel',
+    icon: 'Plane',
+    color: '#06B6D4',
+    type: 'variable',
+    order: 10,
+  },
   miscellaneous: {
     id: 'miscellaneous',
     name: 'Miscellaneous',
     icon: 'CreditCard',
     color: '#6B7280',
     type: 'variable',
-    order: 8,
+    order: 11,
   },
 };
 
-export const FIXED_CATEGORIES: ExpenseCategory[] = ['rent', 'electricity', 'gas', 'wifi', 'groceries'];
-export const VARIABLE_CATEGORIES: ExpenseCategory[] = ['amazon', 'eating_out', 'miscellaneous'];
+export const FIXED_CATEGORIES: ExpenseCategory[] = ['rent', 'electricity', 'gas', 'wifi', 'groceries', 'subscriptions'];
+export const VARIABLE_CATEGORIES: ExpenseCategory[] = ['amazon', 'eating_out', 'fuel', 'travel', 'miscellaneous'];
 
 // ============================================
 // Income Type Configuration

@@ -34,7 +34,7 @@ const defaultSettings: UserSettings = {
   currency: DEFAULT_CURRENCY as CurrencyCode,
   theme: 'system',
   dateFormat: 'MM/DD/YYYY',
-  defaultSalary: 244800,
+  defaultSalary: 0, // New users start with $0 until they set their income
   payFrequency: 'biweekly',
 };
 

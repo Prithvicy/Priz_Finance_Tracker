@@ -26,7 +26,7 @@ import { parseCurrencyToCents } from '@/lib/utils/formatters';
 let mockExpenses: Expense[] = [];
 
 const generateMockExpenses = (): Expense[] => {
-  const categories = ['rent', 'electricity', 'gas', 'wifi', 'groceries', 'amazon', 'eating_out', 'miscellaneous'] as const;
+  const categories = ['rent', 'electricity', 'gas', 'wifi', 'groceries', 'amazon', 'eating_out', 'fuel', 'subscriptions', 'travel', 'miscellaneous'] as const;
   const now = new Date();
   const expenses: Expense[] = [];
 

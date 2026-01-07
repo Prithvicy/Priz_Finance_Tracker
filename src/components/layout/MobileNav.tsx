@@ -17,6 +17,7 @@ import {
   X,
   Target,
   Settings,
+  BarChart2,
 } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
@@ -38,9 +39,9 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Home', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Expenses', href: '/expenses', icon: Receipt },
+  { label: 'Analytics', href: '/analytics', icon: BarChart2 },
   { label: 'Add', href: '#', icon: Plus, isAction: true },
-  { label: 'Income', href: '/income', icon: Wallet },
+  { label: 'Goals', href: '/goals', icon: Target },
   { label: 'More', href: '#', icon: MoreHorizontal, isMore: true },
 ];
 
@@ -88,23 +89,47 @@ const MobileNav = () => {
             exit={{ opacity: 0, y: 20 }}
             className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 lg:hidden"
           >
-            <div className="flex flex-col gap-3 items-center">
-              <Link
-                href="/income/add"
-                onClick={closeAllMenus}
-                className="flex items-center gap-3 px-6 py-3 bg-green-500 text-white rounded-full shadow-lg shadow-green-500/30 font-medium"
-              >
-                <Wallet className="h-5 w-5" />
-                Add Income
-              </Link>
-              <Link
-                href="/expenses/add"
-                onClick={closeAllMenus}
-                className="flex items-center gap-3 px-6 py-3 bg-red-500 text-white rounded-full shadow-lg shadow-red-500/30 font-medium"
-              >
-                <Receipt className="h-5 w-5" />
-                Add Expense
-              </Link>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-3 min-w-[200px]">
+              {/* Add Actions */}
+              <div className="flex flex-col gap-2 mb-3">
+                <Link
+                  href="/income/add"
+                  onClick={closeAllMenus}
+                  className="flex items-center gap-3 px-4 py-3 bg-green-500 text-white rounded-xl font-medium"
+                >
+                  <Wallet className="h-5 w-5" />
+                  Add Income
+                </Link>
+                <Link
+                  href="/expenses/add"
+                  onClick={closeAllMenus}
+                  className="flex items-center gap-3 px-4 py-3 bg-red-500 text-white rounded-xl font-medium"
+                >
+                  <Receipt className="h-5 w-5" />
+                  Add Expense
+                </Link>
+              </div>
+              {/* Divider */}
+              <div className="h-px bg-gray-200 dark:bg-gray-700 mb-2" />
+              {/* View Pages */}
+              <div className="flex flex-col gap-1">
+                <Link
+                  href="/income"
+                  onClick={closeAllMenus}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
+                >
+                  <Wallet className="h-5 w-5 text-green-500" />
+                  <span className="font-medium text-gray-900 dark:text-white">View Income</span>
+                </Link>
+                <Link
+                  href="/expenses"
+                  onClick={closeAllMenus}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
+                >
+                  <Receipt className="h-5 w-5 text-red-500" />
+                  <span className="font-medium text-gray-900 dark:text-white">View Expenses</span>
+                </Link>
+              </div>
             </div>
           </motion.div>
         )}
@@ -120,14 +145,6 @@ const MobileNav = () => {
             className="fixed bottom-28 right-4 z-50 lg:hidden"
           >
             <div className="flex flex-col gap-2 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-2 min-w-[160px]">
-              <Link
-                href="/goals"
-                onClick={closeAllMenus}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
-              >
-                <Target className="h-5 w-5 text-purple-500" />
-                <span className="font-medium text-gray-900 dark:text-white">Goals</span>
-              </Link>
               <Link
                 href="/settings"
                 onClick={closeAllMenus}

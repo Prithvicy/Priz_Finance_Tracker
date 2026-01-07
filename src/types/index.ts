@@ -46,6 +46,9 @@ export type ExpenseCategory =
   | 'groceries'
   | 'amazon'
   | 'eating_out'
+  | 'fuel'
+  | 'subscriptions'
+  | 'travel'
   | 'miscellaneous';
 
 export type CategoryType = 'fixed' | 'variable';

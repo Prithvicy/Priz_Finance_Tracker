@@ -4,13 +4,13 @@
 // Analytics Overview Page
 // ============================================
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { ChevronRight, TrendingUp, TrendingDown, DollarSign, PieChart } from 'lucide-react';
 import { PageContainer, PageSection, Grid } from '@/components/layout';
 import { Card, CardHeader, CardTitle, CardContent, Button, Badge } from '@/components/ui';
 import { CategoryPieChart, MonthlyBarChart, WeeklyTrendLine, IncomeExpenseChart, CategoryStreamChart } from '@/components/charts';
-import { useExpenses, useIncome, useAnalytics, useSettings } from '@/hooks';
+import { useExpenses, useIncome, useAnalytics, useSettings, useCategories } from '@/hooks';
 import { getDateRange, getLastNMonths } from '@/lib/utils/dateUtils';
 import { formatPercentage, formatChange } from '@/lib/utils/formatters';
 import { CATEGORIES } from '@/lib/utils/constants';
@@ -21,6 +21,17 @@ export default function AnalyticsPage() {
   const { expenses, isLoading: expensesLoading } = useExpenses();
   const { income, isLoading: incomeLoading } = useIncome();
   const { formatCurrency } = useSettings();
+  const { getCategoryById } = useCategories();
+
+  // Helper to get category name (supports both default and custom)
+  const getCategoryName = useCallback((categoryId: string) => {
+    const unified = getCategoryById(categoryId);
+    if (unified) return unified.name;
+    if (categoryId in CATEGORIES) {
+      return CATEGORIES[categoryId as keyof typeof CATEGORIES].name;
+    }
+    return categoryId;
+  }, [getCategoryById]);
 
   const dateRange = useMemo(() => getDateRange(period), [period]);
 
@@ -99,7 +110,7 @@ export default function AnalyticsPage() {
             </div>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {analytics.topCategory
-                ? CATEGORIES[analytics.topCategory.category].name
+                ? getCategoryName(analytics.topCategory.category as string)
                 : '--'}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">

@@ -9,3 +9,4 @@ export * from './useToast';
 export * from './useAnalytics';
 export * from './useSettings';
 export * from './useGoals';
+export * from './useCategories';

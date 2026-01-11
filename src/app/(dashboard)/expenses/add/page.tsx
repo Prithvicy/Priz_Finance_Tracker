@@ -4,21 +4,20 @@
 // Add Expense Page
 // ============================================
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PageContainer } from '@/components/layout';
 import { Card, CardContent, Button, Input, CurrencyInput, Select, DatePicker } from '@/components/ui';
-import { useExpenses, useToast, useSettings } from '@/hooks';
+import { useExpenses, useToast, useSettings, useCategories } from '@/hooks';
 import { expenseFormSchema, ExpenseFormSchema } from '@/lib/utils/validators';
-import { CATEGORIES } from '@/lib/utils/constants';
-import { ExpenseCategory } from '@/types';
 import { formatDateForInput } from '@/lib/utils/formatters';
 
 export default function AddExpensePage() {
   const router = useRouter();
   const { addExpense } = useExpenses();
+  const { allCategories } = useCategories();
   const toast = useToast();
   const { currencySymbol } = useSettings();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,24 +31,28 @@ export default function AddExpensePage() {
     resolver: zodResolver(expenseFormSchema),
     defaultValues: {
       amount: '',
-      category: undefined,
+      category: '',
       description: '',
       date: formatDateForInput(new Date()),
       isRecurring: false,
     },
   });
 
-  const categoryOptions = Object.entries(CATEGORIES).map(([value, config]) => ({
-    value,
-    label: config.name,
-  }));
+  // Build category options from unified categories (default + custom)
+  const categoryOptions = useMemo(() =>
+    allCategories.map((cat) => ({
+      value: cat.id,
+      label: cat.name,
+    })),
+    [allCategories]
+  );
 
   const onSubmit = async (data: ExpenseFormSchema) => {
     setIsSubmitting(true);
     try {
       await addExpense({
         amount: parseFloat(data.amount) * 100, // Convert to cents
-        category: data.category as ExpenseCategory,
+        category: data.category as any, // Supports both default and custom category IDs
         description: data.description,
         date: new Date(data.date),
         isRecurring: data.isRecurring,

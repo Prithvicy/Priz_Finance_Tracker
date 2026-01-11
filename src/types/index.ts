@@ -131,7 +131,7 @@ export interface MonthlyTotal {
 }
 
 export interface CategoryBreakdown {
-  category: ExpenseCategory;
+  category: ExpenseCategory | string; // Supports both default and custom category IDs
   amount: number;
   percentage: number;
   count: number;
@@ -278,3 +278,30 @@ export interface GoalInsight {
   message: string;
   action?: string;
 }
+
+// ============================================
+// Custom Categories Types
+// ============================================
+
+export interface CustomCategory {
+  id: string;
+  userId: string;
+  name: string;
+  icon: string;
+  color: string;
+  type: CategoryType;
+  order: number;
+  isDeleted?: boolean; // Soft delete - keeps data for display but hides from picker
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface NewCustomCategory {
+  name: string;
+  icon: string;
+  color: string;
+  type: CategoryType;
+}
+
+// Union type for all categories (default + custom)
+export type CategoryId = ExpenseCategory | string;

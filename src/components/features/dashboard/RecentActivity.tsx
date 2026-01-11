@@ -4,6 +4,7 @@
 // Recent Activity Component
 // ============================================
 
+import { useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ChevronRight, Trash2 } from 'lucide-react';
@@ -12,7 +13,7 @@ import { Card, CardHeader, CardTitle, CardContent, Button, Badge } from '@/compo
 import { Expense } from '@/types';
 import { CATEGORIES } from '@/lib/utils/constants';
 import { formatDateSmart } from '@/lib/utils/formatters';
-import { useSettings } from '@/hooks';
+import { useSettings, useCategories } from '@/hooks';
 import { cn } from '@/lib/cn';
 
 // ============================================
@@ -34,10 +35,11 @@ interface ActivityItemProps {
   index: number;
   onDelete?: (id: string) => void;
   formatCurrency: (cents: number) => string;
+  getCategoryInfo: (id: string) => { name: string; icon: string; color: string; type: string };
 }
 
-const ActivityItem = ({ expense, index, onDelete, formatCurrency }: ActivityItemProps) => {
-  const category = CATEGORIES[expense.category];
+const ActivityItem = ({ expense, index, onDelete, formatCurrency, getCategoryInfo }: ActivityItemProps) => {
+  const category = getCategoryInfo(expense.category as string);
   const IconComponent = LucideIcons[category.icon as keyof typeof LucideIcons] as React.ElementType;
 
   return (
@@ -97,6 +99,21 @@ const ActivityItem = ({ expense, index, onDelete, formatCurrency }: ActivityItem
 
 const RecentActivity = ({ expenses, isLoading, onDelete }: RecentActivityProps) => {
   const { formatCurrency } = useSettings();
+  const { getCategoryById } = useCategories();
+
+  // Helper to get category info (supports both default and custom)
+  const getCategoryInfo = useCallback((categoryId: string) => {
+    const unified = getCategoryById(categoryId);
+    if (unified) {
+      return { name: unified.name, icon: unified.icon, color: unified.color, type: unified.type };
+    }
+    if (categoryId in CATEGORIES) {
+      const config = CATEGORIES[categoryId as keyof typeof CATEGORIES];
+      return { name: config.name, icon: config.icon, color: config.color, type: config.type };
+    }
+    return { name: categoryId, icon: 'CreditCard', color: '#6B7280', type: 'variable' };
+  }, [getCategoryById]);
+
   // Get last 8 expenses
   const recentExpenses = expenses.slice(0, 8);
 
@@ -156,6 +173,7 @@ const RecentActivity = ({ expenses, isLoading, onDelete }: RecentActivityProps) 
                 index={index}
                 onDelete={onDelete}
                 formatCurrency={formatCurrency}
+                getCategoryInfo={getCategoryInfo}
               />
             ))}
           </div>

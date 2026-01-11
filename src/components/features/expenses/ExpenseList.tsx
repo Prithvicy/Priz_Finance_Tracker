@@ -4,7 +4,7 @@
 // Expense List Component
 // ============================================
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { Trash2, Edit2, Filter, Search } from 'lucide-react';
@@ -13,7 +13,7 @@ import { Card, Button, Input, Badge, Modal, ModalFooter } from '@/components/ui'
 import { Expense, ExpenseCategory } from '@/types';
 import { CATEGORIES } from '@/lib/utils/constants';
 import { formatDateSmart } from '@/lib/utils/formatters';
-import { useSettings } from '@/hooks';
+import { useSettings, useCategories } from '@/hooks';
 import { cn } from '@/lib/cn';
 
 // ============================================
@@ -37,10 +37,11 @@ interface ExpenseRowProps {
   onEdit?: (expense: Expense) => void;
   onDelete?: (id: string) => void;
   formatCurrency: (cents: number) => string;
+  getCategoryInfo: (id: string) => { name: string; icon: string; color: string; type: string };
 }
 
-const ExpenseRow = ({ expense, index, onEdit, onDelete, formatCurrency }: ExpenseRowProps) => {
-  const category = CATEGORIES[expense.category];
+const ExpenseRow = ({ expense, index, onEdit, onDelete, formatCurrency, getCategoryInfo }: ExpenseRowProps) => {
+  const category = getCategoryInfo(expense.category as string);
   const IconComponent = LucideIcons[category.icon as keyof typeof LucideIcons] as React.ElementType;
 
   return (
@@ -114,22 +115,37 @@ const ExpenseRow = ({ expense, index, onEdit, onDelete, formatCurrency }: Expens
 
 const ExpenseList = ({ expenses, isLoading, onEdit, onDelete }: ExpenseListProps) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<ExpenseCategory | 'all'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const { formatCurrency } = useSettings();
+  const { allCategories, getCategoryById } = useCategories();
+
+  // Helper to get category info (supports both default and custom)
+  const getCategoryInfo = useCallback((categoryId: string) => {
+    const unified = getCategoryById(categoryId);
+    if (unified) {
+      return { name: unified.name, icon: unified.icon, color: unified.color, type: unified.type };
+    }
+    if (categoryId in CATEGORIES) {
+      const config = CATEGORIES[categoryId as keyof typeof CATEGORIES];
+      return { name: config.name, icon: config.icon, color: config.color, type: config.type };
+    }
+    return { name: categoryId, icon: 'CreditCard', color: '#6B7280', type: 'variable' };
+  }, [getCategoryById]);
 
   // Filter expenses
-  const filteredExpenses = expenses.filter((expense) => {
+  const filteredExpenses = useMemo(() => expenses.filter((expense) => {
+    const catInfo = getCategoryInfo(expense.category as string);
     const matchesSearch =
       searchQuery === '' ||
-      CATEGORIES[expense.category].name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      catInfo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       expense.description?.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesCategory =
       selectedCategory === 'all' || expense.category === selectedCategory;
 
     return matchesSearch && matchesCategory;
-  });
+  }), [expenses, searchQuery, selectedCategory, getCategoryInfo]);
 
   // Group by date
   const groupedExpenses = filteredExpenses.reduce((groups, expense) => {
@@ -189,15 +205,15 @@ const ExpenseList = ({ expenses, isLoading, onEdit, onDelete }: ExpenseListProps
           >
             All
           </Button>
-          {Object.keys(CATEGORIES).map((cat) => (
+          {allCategories.map((cat) => (
             <Button
-              key={cat}
-              variant={selectedCategory === cat ? 'primary' : 'outline'}
+              key={cat.id}
+              variant={selectedCategory === cat.id ? 'primary' : 'outline'}
               size="sm"
-              onClick={() => setSelectedCategory(cat as ExpenseCategory)}
+              onClick={() => setSelectedCategory(cat.id)}
               className="flex-shrink-0 whitespace-nowrap"
             >
-              {CATEGORIES[cat as ExpenseCategory].name}
+              {cat.name}
             </Button>
           ))}
         </div>
@@ -231,6 +247,7 @@ const ExpenseList = ({ expenses, isLoading, onEdit, onDelete }: ExpenseListProps
                         onEdit={onEdit}
                         onDelete={() => setDeleteId(expense.id)}
                         formatCurrency={formatCurrency}
+                        getCategoryInfo={getCategoryInfo}
                       />
                     ))}
                   </div>

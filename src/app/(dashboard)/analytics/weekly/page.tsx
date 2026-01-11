@@ -4,12 +4,12 @@
 // Weekly Analytics Page
 // ============================================
 
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 import { PageContainer, PageSection, Grid } from '@/components/layout';
 import { Card, CardHeader, CardTitle, CardContent, Badge } from '@/components/ui';
 import { WeeklyTrendLine } from '@/components/charts';
-import { useExpenses, useAnalytics, useSettings } from '@/hooks';
+import { useExpenses, useAnalytics, useSettings, useCategories } from '@/hooks';
 import { getDateRange } from '@/lib/utils/dateUtils';
 import { formatDateSmart } from '@/lib/utils/formatters';
 import { CATEGORIES } from '@/lib/utils/constants';
@@ -18,6 +18,20 @@ import { cn } from '@/lib/cn';
 export default function WeeklyAnalyticsPage() {
   const { expenses, isLoading } = useExpenses();
   const { formatCurrency } = useSettings();
+  const { getCategoryById } = useCategories();
+
+  // Helper to get category info (supports both default and custom)
+  const getCategoryInfo = useCallback((categoryId: string) => {
+    const unified = getCategoryById(categoryId);
+    if (unified) {
+      return { name: unified.name, color: unified.color };
+    }
+    if (categoryId in CATEGORIES) {
+      const config = CATEGORIES[categoryId as keyof typeof CATEGORIES];
+      return { name: config.name, color: config.color };
+    }
+    return { name: categoryId, color: '#6B7280' };
+  }, [getCategoryById]);
 
   const dateRange = useMemo(() => {
     const now = new Date();
@@ -80,7 +94,7 @@ export default function WeeklyAnalyticsPage() {
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Top Category</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {analytics.topCategory
-                ? CATEGORIES[analytics.topCategory.category].name
+                ? getCategoryInfo(analytics.topCategory.category as string).name
                 : '--'}
             </p>
           </Card>
@@ -125,7 +139,7 @@ export default function WeeklyAnalyticsPage() {
               {dayExp.length > 0 && (
                 <CardContent className="divide-y divide-gray-100 dark:divide-gray-800">
                   {dayExp.map((expense) => {
-                    const category = CATEGORIES[expense.category];
+                    const category = getCategoryInfo(expense.category as string);
                     return (
                       <div
                         key={expense.id}

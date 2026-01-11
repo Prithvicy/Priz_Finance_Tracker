@@ -4,12 +4,12 @@
 // Monthly Analytics Page
 // ============================================
 
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { format } from 'date-fns';
 import { PageContainer, PageSection, Grid } from '@/components/layout';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui';
 import { CategoryPieChart, MonthlyBarChart, IncomeExpenseChart } from '@/components/charts';
-import { useExpenses, useIncome, useAnalytics, useSettings } from '@/hooks';
+import { useExpenses, useIncome, useAnalytics, useSettings, useCategories } from '@/hooks';
 import { getDateRange, getLastNMonths } from '@/lib/utils/dateUtils';
 import { formatPercentage } from '@/lib/utils/formatters';
 import { CATEGORIES } from '@/lib/utils/constants';
@@ -18,6 +18,20 @@ export default function MonthlyAnalyticsPage() {
   const { expenses, isLoading: expensesLoading } = useExpenses();
   const { income, isLoading: incomeLoading } = useIncome();
   const { formatCurrency } = useSettings();
+  const { getCategoryById } = useCategories();
+
+  // Helper to get category info (supports both default and custom)
+  const getCategoryInfo = useCallback((categoryId: string) => {
+    const unified = getCategoryById(categoryId);
+    if (unified) {
+      return { name: unified.name, color: unified.color };
+    }
+    if (categoryId in CATEGORIES) {
+      const config = CATEGORIES[categoryId as keyof typeof CATEGORIES];
+      return { name: config.name, color: config.color };
+    }
+    return { name: categoryId, color: '#6B7280' };
+  }, [getCategoryById]);
 
   const dateRange = useMemo(() => getDateRange('month'), []);
 
@@ -92,7 +106,7 @@ export default function MonthlyAnalyticsPage() {
             <CardContent>
               <div className="space-y-3">
                 {analytics.categoryBreakdown.map((cat) => {
-                  const config = CATEGORIES[cat.category];
+                  const config = getCategoryInfo(cat.category as string);
                   return (
                     <div key={cat.category} className="flex items-center gap-3">
                       <div

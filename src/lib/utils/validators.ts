@@ -16,6 +16,9 @@ export const expenseCategories = [
   'groceries',
   'amazon',
   'eating_out',
+  'fuel',
+  'subscriptions',
+  'travel',
   'miscellaneous',
 ] as const;
 
@@ -31,9 +34,8 @@ export const expenseFormSchema = z.object({
       const num = parseFloat(val);
       return num < 1000000;
     }, 'Amount must be less than $1,000,000'),
-  category: z.enum(expenseCategories, {
-    message: 'Please select a category',
-  }),
+  // Accept either default categories or custom category IDs (strings starting with 'custom-')
+  category: z.string().min(1, 'Please select a category'),
   description: z.string().max(200, 'Description must be less than 200 characters').optional(),
   date: z.string().min(1, 'Date is required'),
   isRecurring: z.boolean(),

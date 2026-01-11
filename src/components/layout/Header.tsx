@@ -4,13 +4,19 @@
 // Header Component
 // ============================================
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Menu, X, Bell, Settings, LogOut, User } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, Bell, Settings, LogOut, User, Sparkles, Plus } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Button } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
+
+// ============================================
+// Notification Storage Key
+// ============================================
+
+const NOTIFICATION_STORAGE_KEY = 'priz-notification-read-v1';
 
 // ============================================
 // Types
@@ -28,6 +34,23 @@ interface HeaderProps {
 const Header = ({ onMenuClick, showMenuButton = true }: HeaderProps) => {
   const { user, logout, isAuthenticated } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [hasUnreadNotification, setHasUnreadNotification] = useState(false);
+
+  // Check localStorage for notification read status on mount
+  useEffect(() => {
+    const isRead = localStorage.getItem(NOTIFICATION_STORAGE_KEY);
+    setHasUnreadNotification(!isRead);
+  }, []);
+
+  // Handle notification click
+  const handleNotificationClick = () => {
+    setShowNotification(!showNotification);
+    if (hasUnreadNotification) {
+      localStorage.setItem(NOTIFICATION_STORAGE_KEY, 'true');
+      setHasUnreadNotification(false);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -63,10 +86,97 @@ const Header = ({ onMenuClick, showMenuButton = true }: HeaderProps) => {
         {/* Right Side */}
         <div className="flex items-center gap-2">
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full" />
-          </Button>
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative"
+              onClick={handleNotificationClick}
+            >
+              <Bell className="h-5 w-5" />
+              {hasUnreadNotification && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute top-1 right-1 h-2.5 w-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-900"
+                />
+              )}
+            </Button>
+
+            {/* Notification Popup */}
+            <AnimatePresence>
+              {showNotification && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowNotification(false)}
+                  />
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    className={cn(
+                      'absolute right-0 top-full mt-2 w-80 py-3 px-4 z-50',
+                      'bg-white dark:bg-gray-900 rounded-xl shadow-xl',
+                      'border border-gray-200 dark:border-gray-800'
+                    )}
+                  >
+                    {/* New Feature Badge */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center gap-1.5 px-2 py-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full">
+                        <Sparkles className="h-3 w-3 text-white" />
+                        <span className="text-xs font-semibold text-white">New Feature</span>
+                      </div>
+                    </div>
+
+                    {/* Feature Title */}
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
+                      Custom Categories
+                    </h3>
+
+                    {/* Feature Description */}
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      You can now create your own expense categories! Tap the{' '}
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-indigo-100 dark:bg-indigo-900/50 rounded text-indigo-600 dark:text-indigo-400 font-medium">
+                        <Plus className="h-3 w-3" />
+                        Add New
+                      </span>{' '}
+                      button when adding an expense to create custom categories with your choice of icon and color.
+                    </p>
+
+                    {/* Features List */}
+                    <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-1.5 mb-3">
+                      <li className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                        Custom icons and colors
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-purple-500" />
+                        Automatic chart integration
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-pink-500" />
+                        Easy edit & delete options
+                      </li>
+                    </ul>
+
+                    {/* Close Button */}
+                    <button
+                      onClick={() => setShowNotification(false)}
+                      className="w-full py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors"
+                    >
+                      Got it!
+                    </button>
+
+                    {/* Credit Line */}
+                    <p className="mt-2 text-[10px] text-gray-400 dark:text-gray-500 text-right">
+                      — thanks for the idea Jazz
+                    </p>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Settings */}
           <Link href="/settings">

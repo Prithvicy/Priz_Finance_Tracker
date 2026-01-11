@@ -4,12 +4,12 @@
 // Category Breakdown Pie Chart
 // ============================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { CategoryBreakdown } from '@/types';
 import { CATEGORIES } from '@/lib/utils/constants';
 import { formatPercentage } from '@/lib/utils/formatters';
-import { useSettings } from '@/hooks';
+import { useSettings, useCategories } from '@/hooks';
 import { ChartContainer } from './ChartContainer';
 
 // ============================================
@@ -52,7 +52,7 @@ interface CategoryPieChartProps {
 
 interface TooltipProps {
   active?: boolean;
-  payload?: Array<{ payload: CategoryBreakdown & { fill: string } }>;
+  payload?: Array<{ payload: CategoryBreakdown & { fill: string; name: string } }>;
   formatCurrency: (cents: number, showCents?: boolean) => string;
 }
 
@@ -60,17 +60,16 @@ const CustomTooltip = ({ active, payload, formatCurrency }: TooltipProps) => {
   if (!active || !payload?.length) return null;
 
   const data = payload[0].payload;
-  const categoryConfig = CATEGORIES[data.category];
 
   return (
     <div className="bg-white dark:bg-gray-800 px-4 py-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
       <div className="flex items-center gap-2 mb-1">
         <div
           className="w-3 h-3 rounded-full"
-          style={{ backgroundColor: categoryConfig.color }}
+          style={{ backgroundColor: data.fill }}
         />
         <p className="text-sm font-medium text-gray-900 dark:text-white">
-          {categoryConfig.name}
+          {data.name}
         </p>
       </div>
       <p className="text-lg font-bold text-gray-900 dark:text-white">
@@ -88,7 +87,7 @@ const CustomTooltip = ({ active, payload, formatCurrency }: TooltipProps) => {
 // ============================================
 
 interface LegendProps {
-  payload?: Array<{ value: string; color: string; payload: CategoryBreakdown }>;
+  payload?: Array<{ value: string; color: string; payload: CategoryBreakdown & { name: string; fill: string } }>;
 }
 
 const CustomLegend = ({ payload }: LegendProps) => {
@@ -97,15 +96,14 @@ const CustomLegend = ({ payload }: LegendProps) => {
   return (
     <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">
       {payload.map((entry, index) => {
-        const categoryConfig = CATEGORIES[entry.payload.category];
         return (
           <div key={index} className="flex items-center gap-1.5">
             <div
               className="w-2.5 h-2.5 rounded-full"
-              style={{ backgroundColor: categoryConfig.color }}
+              style={{ backgroundColor: entry.payload.fill }}
             />
             <span className="text-xs text-gray-600 dark:text-gray-400">
-              {categoryConfig.name}
+              {entry.payload.name}
             </span>
           </div>
         );
@@ -121,13 +119,36 @@ const CustomLegend = ({ payload }: LegendProps) => {
 const CategoryPieChart = ({ data, isLoading, totalAmount }: CategoryPieChartProps) => {
   const pieSize = useResponsivePieSize();
   const { formatCurrency } = useSettings();
+  const { getCategoryById } = useCategories();
 
-  // Prepare chart data with colors
-  const chartData = data.map((item) => ({
-    ...item,
-    name: CATEGORIES[item.category].name,
-    fill: CATEGORIES[item.category].color,
-  }));
+  // Helper to get category info (supports both default and custom categories)
+  const getCategoryInfo = useCallback((categoryId: string) => {
+    // First try to get from unified categories (includes custom)
+    const unified = getCategoryById(categoryId);
+    if (unified) {
+      return { name: unified.name, color: unified.color };
+    }
+    // Fallback to default categories
+    if (categoryId in CATEGORIES) {
+      const config = CATEGORIES[categoryId as keyof typeof CATEGORIES];
+      return { name: config.name, color: config.color };
+    }
+    // Ultimate fallback for unknown categories
+    return { name: categoryId, color: '#6B7280' };
+  }, [getCategoryById]);
+
+  // Prepare chart data with colors (supports custom categories)
+  const chartData = useMemo(() =>
+    data.map((item) => {
+      const info = getCategoryInfo(item.category as string);
+      return {
+        ...item,
+        name: info.name,
+        fill: info.color,
+      };
+    }),
+    [data, getCategoryInfo]
+  );
 
   return (
     <ChartContainer

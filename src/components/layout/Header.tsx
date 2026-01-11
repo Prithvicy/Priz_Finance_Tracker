@@ -116,8 +116,8 @@ const Header = ({ onMenuClick, showMenuButton = true }: HeaderProps) => {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
                     className={cn(
-                      'absolute right-0 top-full mt-2 w-80 py-3 px-4 z-50',
-                      'bg-white dark:bg-gray-900 rounded-xl shadow-xl',
+                      'fixed sm:absolute left-4 right-4 sm:left-auto sm:right-0 top-20 sm:top-full sm:mt-2 py-3 px-4 z-50',
+                      'sm:w-80 bg-white dark:bg-gray-900 rounded-xl shadow-xl',
                       'border border-gray-200 dark:border-gray-800'
                     )}
                   >

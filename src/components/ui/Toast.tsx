@@ -50,7 +50,7 @@ const ToastItem = ({ id, type, message, onClose }: ToastItemProps) => {
       transition={{ duration: 0.2 }}
       className={cn(
         'flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg',
-        'min-w-[300px] max-w-[400px]',
+        'w-[calc(100vw-2rem)] sm:w-auto sm:min-w-[300px] sm:max-w-[400px]',
         styles[type]
       )}
     >
@@ -77,10 +77,10 @@ interface ToastContainerProps {
 }
 
 const positionStyles = {
-  'top-right': 'top-4 right-4',
-  'top-left': 'top-4 left-4',
-  'bottom-right': 'bottom-4 right-4',
-  'bottom-left': 'bottom-4 left-4',
+  'top-right': 'top-4 left-4 right-4 sm:left-auto sm:right-4',
+  'top-left': 'top-4 left-4 right-4 sm:right-auto sm:left-4',
+  'bottom-right': 'bottom-4 left-4 right-4 sm:left-auto sm:right-4',
+  'bottom-left': 'bottom-4 left-4 right-4 sm:right-auto sm:left-4',
 };
 
 const ToastContainer = ({
